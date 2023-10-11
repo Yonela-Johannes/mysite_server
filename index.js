@@ -22,7 +22,7 @@ const postCommentRouter = require("./routes/postComment");
 const storiesRouter = require("./routes/storiesRouter");
 const storyCommentRouter = require("./routes/storyCommentRouter");
 const dotenv = require("dotenv").config();
-const PORT = !process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(
   session({
