@@ -41,7 +41,7 @@ app.use(passport.initialize());
 app.use(passport.session())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : true }))
-app.use(cors({origin: ['http://localhost:3000', 'https://90bd-197-95-86-43.ngrok-free.app'], credentials: true}));
+app.use(cors({origin: ['http://localhost:3000', 'https://yonela-johannes.github.io/mysite/', 'https://johannesyonela.engineer'], credentials: true}));
 
 app.use("/api/user", userRouter);
 app.use("/api/reviews", reviewRouter);
