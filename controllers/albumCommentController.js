@@ -1,13 +1,13 @@
-const PostComment = require("../models/postCommentModel");
-const Post = require("../models/postModel");
+const AlbumComment = require("../models/ablumCommentModel");
+const Album = require("../models/albumModel");
 
-const getPostComments = async (req, res) => {
+const getAlbumComments = async (req, res) => {
   const { id } = req.params
   console.log(req.params)
   return ''
 
   try {
-    const comments = await PostComment.find({post: id}).populate('user').populate('post').sort({"createdAt": -1})
+    const comments = await AlbumComment.find({post: id}).populate('user').populate('post').sort({"createdAt": -1})
     res.status(200).json(comments)
   } catch (error) {
     console.log(error)
@@ -15,7 +15,7 @@ const getPostComments = async (req, res) => {
   }
 }
 
-const addPostComment = async (req, res) => {
+const addAlbumComment = async (req, res) => {
   const { postId, userId, comment } = req.body;
 
   if (!postId || !userId || !comment) {
@@ -24,11 +24,11 @@ const addPostComment = async (req, res) => {
     });
   }
 
-  const newComment = new PostComment({ post: postId, user: userId, comment });
+  const newComment = new AlbumComment({ post: postId, user: userId, comment });
   try {
     const saveComment = await newComment.save();
     if (saveComment) {
-      await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } });
+      await Album.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } });
     }
     res.status(200).json({
       status: 'success',
@@ -43,26 +43,25 @@ const addPostComment = async (req, res) => {
   }
 }
 
-
-const deletePostComment = async (req, res) => {
-
-}
-
-const updatePostComment = async (req, res) => {
+const deleteAlbumComment = async (req, res) => {
 
 }
 
-const likePostComment = async (req, res) => {
+const updateAlbumComment = async (req, res) => {
+
+}
+
+const likeAlbumComment = async (req, res) => {
   const { id: _id } = req.params;
   const { userId: id } = req.body;
 
   // if(!req.userId) return res.json({message: 'Unauthenticated'});
   // if(!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send('No blog with that id')
 
-  const blog = await BlogComment.findById(_id);
-  const updatedPost = await BlogComment.findByIdAndUpdate(_id, {user: userId, likeCount: blog.likeCount + 1}, { new: true});
+  const blog = await AlbumComment.findById(_id);
+  const updatedPost = await AlbumComment.findByIdAndUpdate(_id, {user: userId, likeCount: blog.likeCount + 1}, { new: true});
 
   res.json(updatedPost)
 }
 
-module.exports = {getPostComments, addPostComment, deletePostComment, updatePostComment, likePostComment}
+module.exports = {getAlbumComments, addAlbumComment, deleteAlbumComment, updateAlbumComment, likeAlbumComment}

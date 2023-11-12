@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
-const PostCommentSchema = new mongoose.Schema({
+const SongCommentSchema = new mongoose.Schema({
     user: {
       type: mongoose.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    post: {
+    song: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "Post",
+      ref: "Song",
     },
     comment: {
       type: String,
@@ -29,4 +29,4 @@ const PostCommentSchema = new mongoose.Schema({
   }
 );
 
-module.exports = mongoose.model("PostComment", PostCommentSchema);
+module.exports = mongoose.model("SongComment", SongCommentSchema);

@@ -1,21 +1,36 @@
 const mongoose = require("mongoose");
 
-const storySchema = mongoose.Schema({
+const AlbumSchema = mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
     required: true,
     ref: "User",
   },
-  caption: {
+  artist: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "Artist",
+  },
+  title: {
     type: String,
     required: true
   },
-  story: {
-    type: String,
+  date: {
+    type: Date,
+    required: true
   },
-  viewCount: {
-    type: Number,
-    default: 0
+  cover: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  songs: {
+    type: [mongoose.Types.ObjectId],
+    default: [],
+    ref: "Song",
   },
   commentCount: {
     type: Number,
@@ -36,4 +51,4 @@ const storySchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Story", storySchema);
+module.exports = mongoose.model("Album", AlbumSchema);

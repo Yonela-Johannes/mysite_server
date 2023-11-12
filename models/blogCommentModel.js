@@ -1,33 +1,31 @@
 const mongoose = require("mongoose");
-const { stringify } = require("uuid");
 
 const BlogCommentSchema = new mongoose.Schema({
     user: {
       type: mongoose.Types.ObjectId,
-      required: true,
       ref: "User",
+      required: true
     },
     blog: {
       type: mongoose.Types.ObjectId,
-      required: true,
       ref: "Blog",
+      required: true
     },
     comment: {
       type: String,
-      required: true,
+      required: true
     },
-    likesCount: {
+    loveCount: {
       type: Number,
       default: 0,
     },
-    likedUsers: {
-      type: [mongoose.Types.ObjectId],
-      default: [],
-      ref: "User"
-    },
+    lovedUsers: {
+      type: [String],
+      default: []
+    }
   },{
     timestamps: true
   }
 );
 
-module.exports = mongoose.model("BlogComment", BlogCommentSchema);
+module.exports =  mongoose.model("BlogComment", BlogCommentSchema);

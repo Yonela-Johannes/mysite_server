@@ -26,11 +26,30 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    isArtist: {
+      type: Boolean,
+      default: false,
+    },
+    nick: {
+      type: String,
+    },
+    quote: {
+      type: String,
+    },
+    role: {
+      type: String,
+    },
+    title: {
+      type: String,
+    },
+    artist: {
+      type: mongoose.Types.ObjectId,
+      ref: "Artist",
+    },
     isBlocked: {
       type: Boolean,
       default: false,
     },
-    quote: String,
   },{
     timestamps: true
   }

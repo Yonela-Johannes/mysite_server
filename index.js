@@ -8,19 +8,16 @@ const { authMiddleware, isAdmin } = require("./middlewares/authMiddleware");
 const { handleError, notFound } = require("./middlewares/errorHandler");
 const app = express();
 const userRouter = require("./routes/userRoutes");
-const reviewRouter = require("./routes/reviewRoutes");
-const contactRouter = require("./routes/contactRoutes");
-const projectCategoryRouter = require("./routes/projectCategoryRoutes");
-const projectRouter = require("./routes/projectRoutes");
-const blogRouter = require("./routes/blogRouter");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
-const categoriesRouter = require("./routes/categoriesRouter");
+const songCommentRouter = require("./routes/songComment");
+const albumRouter = require("./routes/albumRouter");
+const songsRouter = require("./routes/songsRouter");
+const albumCommentRouter = require("./routes/albumComment");
+const artistsRouter = require("./routes/artistsRouter");
+const blogRouter = require("./routes/blogsRouter");
+const categoryRouter = require("./routes/categoryRouter");
 const blogCommentRouter = require("./routes/blogComments");
-const postRouter = require("./routes/postRouter");
-const postCommentRouter = require("./routes/postComment");
-const storiesRouter = require("./routes/storiesRouter");
-const storyCommentRouter = require("./routes/storyCommentRouter");
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 
@@ -44,17 +41,14 @@ app.use(bodyParser.urlencoded({ extended : true }))
 app.use(cors({origin: ['http://localhost:3000', 'https://yonela-johannes.github.io', 'https://yonela-johannes.github.io/mysite', 'https://johannesyonela.engineer'], credentials: true}));
 
 app.use("/api/user", userRouter);
-app.use("/api/reviews", reviewRouter);
-app.use("/api/contacts", contactRouter);
-app.use("/api/project-categories", projectCategoryRouter);
-app.use("/api/projects", projectRouter);
-app.use("/api/blogs", blogRouter);
+app.use("/api/songs", songsRouter);
+app.use("/api/artists", artistsRouter);
 app.use("/api/blog-comment", blogCommentRouter);
-app.use("/api/posts", postRouter);
-app.use("/api/post-comment", postCommentRouter);
-app.use("/api/stories", storiesRouter);
-app.use("/api/story-comment", storyCommentRouter);
-app.use("/api/categories", categoriesRouter);
+app.use("/api/post-comment", songCommentRouter);
+app.use("/api/album-comment", albumCommentRouter);
+app.use("/api/album", albumRouter);
+app.use('/api/blog',  blogRouter);
+app.use("/api/category", categoryRouter);
 
 app.use(notFound)
 app.use(handleError)

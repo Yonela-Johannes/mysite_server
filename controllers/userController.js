@@ -1,8 +1,8 @@
 const User = require("../models/userModel");
+const Artist = require("../models/artistModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../config/validateMongoDbId")
 const jwt = require('jsonwebtoken')
-const sendmail = require("../controllers/emailController")
 
 // Login to existing user
 // @desc Login to existing user
@@ -62,33 +62,86 @@ const loginUser = asyncHandler( async (req, res, next) => {
   }
 });
 
+// Login to existing user
+// @desc Login to existing user
+// @route GET /api/users/login
+// @access Private
+const createArtist = asyncHandler( async (req, res) => {
+  const {userId, name, picture, quote } = req.body
+  console.log(req.body)
+  if(userId){
+    // check if user exist or not
+    const findUser = await Artist.findOne({user: userId})
+    console.log(findUser)
+    if(findUser){
+      res.status(200).json({
+        status: true,
+        message: "User Fetch Successful!",
+        artist: findUser
+      });
+    } else {
+      // create the user
+      const createdArtist = await Artist.create({user: userId, name, picture, quote});
+      if(createdArtist){
+        const createdUser = await User.findByIdAndUpdate(userId, {artist: createdArtist._id})
+        if(createdUser){
+          res.status(201).json({
+            status: true,
+            message: "User Created Successfully!",
+            artist: createdUser
+          });
+        }else{
+          res.json({message: 'User not updated'})
+        }
+      } else{
+        res.json({message: 'Artist not created'})
+      }
+    }
+  }else {
+    throw new Error("Invalid Credentials")
+  }
+});
+
 // Fetch all users
 // @desc Retrieve all user
-// @route POST /api/users/update
+// @route GET /api/users/update
 const getAllUsers = asyncHandler(async (req, res) => {
     try {
-      const allUsers = await User.find();
+      const allUsers = await User.find({isAdmin: false});
       res
         .status(200)
         .json({
           status: true,
           message: "All Users Fetched Successfully",
-          Users: allUsers,
+          users: allUsers,
         })
     } catch (error){
       throw new Error('Something went wrong')
     }
 });
 
+const getAllAppUsers = asyncHandler(async (req, res) => {
+  try {
+    const allUsers = await User.find();
+    res
+      .status(200)
+      .json({
+        status: true,
+        message: "All Users Fetched Successfully",
+        users: allUsers,
+      })
+  } catch (error){
+    throw new Error('Something went wrong')
+  }
+});
 // Fetch user
 // @desc Get user
-// @route POST /api/user/:id
+// @route GET /api/user/:id
 // access Admin/Users
 const getUser = asyncHandler(async (req, res) => {
   const { userId } = req.params
-  console.log("This is the user Id:: ::", userId)
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate('artist');
     if(user){
       res
         .status(200)
@@ -104,6 +157,48 @@ const getUser = asyncHandler(async (req, res) => {
     throw new Error(error)
   }
 });
+// Fetch all users
+// @desc Retrieve all user
+// @route POST /api/users/update
+const getAllAdmins = asyncHandler(async (req, res) => {
+  try {
+    const allUsers = await User.find({isAdmin: true});
+    res
+      .status(200)
+      .json({
+        status: true,
+        message: "All Users Fetched Successfully",
+        admins: allUsers,
+      })
+  } catch (error){
+    throw new Error('Something went wrong')
+  }
+});
+
+// Fetch user
+// @desc Get user
+// @route POST /api/user/:id
+// access Admin/Users
+const getAdmin = asyncHandler(async (req, res) => {
+  const { userId } = req.params
+  try {
+    const user = await User.findById(userId).populate('artist');
+    if(user){
+      res
+        .status(200)
+        .json({
+          status: true,
+          message: "Admin Fetched Successfully",
+          user,
+        })
+    }else{
+      throw new Error("User does not exist")
+    }
+  } catch (error){
+    throw new Error(error)
+  }
+});
+
 
 // Find user
 // @desc search user
@@ -140,22 +235,46 @@ const findUser = asyncHandler(async (req, res) => {
 // @route POST /api/update/:id
 // access Admin/User
 const updateUser = asyncHandler(async (req, res) => {
-  const { userId } = req.params
-  validateMongoDbId(userId)
+  const { userId } = req.params;
+  const { given_name, family_name, nick, title, quote } = req.body;
+
   try {
-    const user = await User.findByIdAndUpdate({_id: userId},req.body ,{new: true}
-    );
-    res
-      .status(200)
-      .json({
+    // Find the existing user data
+    const userData = await User.findById({ _id: userId });
+
+    if (userData) {
+      // Merge the existing data with the new data
+      const updatedUserData = {
+        ...userData.toObject(), // Convert Mongoose document to plain JavaScript object
+        given_name: given_name || userData.given_name,
+        family_name: family_name || userData.family_name,
+        nick: nick || userData.nick,
+        title: title || userData.title,
+        quote: quote || userData.quote,
+        // Add more fields as needed
+      };
+
+      // Update the user
+      const user = await User.updateOne({ _id: userData?._id }, updatedUserData);
+
+      res.status(200).json({
         status: true,
         message: "Profile Updated Successfully",
         user,
-      })
-  } catch (error){
-    throw new Error('Something went wrong')
+      });
+    }
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 });
+
+// Assuming that asyncHandler is a middleware handling async errors
+
 
 // Block user
 // @desc block user from site
@@ -219,10 +338,14 @@ const logoutUser = asyncHandler(async (req, res) => {
 module.exports = {
   loginUser,
   logoutUser,
+  getAllAdmins,
+  getAdmin,
+  getAllAppUsers,
   getAllUsers,
   getUser,
   findUser,
   updateUser,
   blockUser,
   unblockUser,
+  createArtist,
 }

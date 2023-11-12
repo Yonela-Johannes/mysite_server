@@ -1,39 +1,51 @@
 const mongoose = require("mongoose");
 
-const blogSchema = mongoose.Schema({
+const songSchema = mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
+    required: true,
     ref: "User",
-    required: true
+  },
+  artist: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "Artist",
   },
   title: {
     type: String,
     required: true
   },
-  subtitle: {
+  lyrics: {
     type: String,
     required: true
   },
-  post: {
-    type: String,
+  date: {
+    type: Date,
     required: true
   },
-  image: {
-    type: String,
-    required: true
-  },
-  category: {
+  album: {
     type: mongoose.Types.ObjectId,
-    ref: "Category",
+    ref: "Album",
+  },
+  cover: {
+    type: String,
     required: true
   },
-  viewCount: {
+  song: {
+    type: String,
+    required: true
+  },
+  playCount: {
     type: Number,
     default: 0
   },
-  viewedUsers: {
+  downloadCount: {
+    type: Number,
+    default: 0
+  },
+  downloadedUsers: {
     type: [String],
-    default: []
+    default: [],
   },
   loveCount: {
     type: Number,
@@ -41,15 +53,8 @@ const blogSchema = mongoose.Schema({
   },
   lovedUsers: {
     type: [String],
-    default: []
-  },
-  commentsCount: {
-    type: Number,
-    default: 0,
-  },
-  commentedUsers: {
-    type: [String],
-    default: []
+    default: [],
+    ref: "User",
   },
   createdAt: {
     type: Date,
@@ -57,4 +62,4 @@ const blogSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Blog", blogSchema);
+module.exports = mongoose.model("Song", songSchema);
