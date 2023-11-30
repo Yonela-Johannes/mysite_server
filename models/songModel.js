@@ -17,7 +17,6 @@ const songSchema = mongoose.Schema({
   },
   lyrics: {
     type: String,
-    required: true
   },
   date: {
     type: Date,

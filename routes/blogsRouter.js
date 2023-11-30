@@ -7,11 +7,13 @@ const {
   getBlog,
   loveBlog,
   viewBlog,
+  getFeaturedBlogs,
  } = require("../controllers/blogController");
 
 const blogRouter = express.Router();
 
 blogRouter.get('/', getBlogs)
+blogRouter.get('/featured', getFeaturedBlogs)
 blogRouter.get('/:id', getBlog)
 blogRouter.post('/', createBlog);
 blogRouter.delete('/:id', deleteBlog);

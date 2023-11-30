@@ -13,6 +13,8 @@ const {
   getSongsByArtist,
   searchSong,
   topPlay,
+  getFavorites,
+  recentPlay,
  } = require("../controllers/songsController");
 
 const songsRouter = express.Router();
@@ -20,6 +22,7 @@ const songsRouter = express.Router();
 songsRouter.get('/', getSongs)
 songsRouter.get('/search/:searchTerm', searchSong)
 songsRouter.get('/artist-song/:id', getSongsByArtist)
+songsRouter.get('/favorites/:userId', getFavorites)
 songsRouter.get('/recent', getNewSongs)
 songsRouter.get('/:id', getSong)
 songsRouter.post('/', addSong);

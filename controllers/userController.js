@@ -9,13 +9,35 @@ const jwt = require('jsonwebtoken')
 // @route POST /api/users/login
 // @access Private
 const loginUser = asyncHandler( async (req, res, next) => {
-  const { oauthCode } = req.body
-  const userInfo = jwt.decode(oauthCode)
-  let { email, given_name, family_name, picture, email_verified } = userInfo
 
-  if(email){
+  let data;
+  if(req.body?.user?.email){
+    data = {
+      email,
+      given_name,
+      family_name,
+      picture,
+      email_verified
+    }
+  }
+
+  if(req.body?.oauthCode){
+    const userInfo = jwt.decode(req.body?.oauthCode)
+    let { email, given_name, family_name, picture, email_verified } = userInfo
+    console.log(userInfo)
+    data = {
+      email,
+      given_name,
+      family_name,
+      picture,
+      email_verified
+    }
+  }
+
+  console.log(data)
+  if(data?.email){
     // check if user exist or not
-    const findUser = await User.findOne({ email })
+    const findUser = await User.findOne({ email: data.email })
     console.log(findUser)
     if(findUser){
       const { given_name, family_name, email, picture, isAdmin, isBlocked, servers, members, channels, _id} = findUser

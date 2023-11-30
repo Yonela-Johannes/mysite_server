@@ -10,6 +10,16 @@ const getBlogs = async (req, res) => {
   }
 }
 
+const getFeaturedBlogs = async (req, res) => {
+  try {
+      const blogs = await Blog.find().populate('user').populate('category');
+      res.status(200).json(blogs)
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({message: error.message})
+  }
+}
+
 const getBlog = async (req, res) => {
   const { id: _id } = req.params;
   try {
@@ -190,6 +200,7 @@ const viewBlog = async (req, res) => {
 }
 
 module.exports =  {
+  getFeaturedBlogs,
   getBlogs,
   getBlog,
   createBlog,

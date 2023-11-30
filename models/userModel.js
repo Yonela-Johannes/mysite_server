@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema({
     role: {
       type: String,
     },
+    bio: {
+      type: String,
+    },
     title: {
       type: String,
     },
@@ -50,6 +53,10 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    playlist: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Song',
+    }],
   },{
     timestamps: true
   }

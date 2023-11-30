@@ -27,12 +27,12 @@ const artistSchema = new mongoose.Schema({
       type: Boolean,
       default: true,
     },
-    lovedUsers: {
-      type: mongoose.Types.ObjectId,
-      required: true,
+    followedUsers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      default: [],
       ref: "User",
-    },
-    loveCount: {
+    }],
+    followedUsersCount: {
       type: Number,
       default: 0,
     },

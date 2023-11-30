@@ -58,27 +58,10 @@ const getAlbumSongs = async (req, res) => {
 }
 
 const createAlbum = async (req, res) => {
-  const { userId, title, date, cover, artists, songs, artistId, description } = req.body
-
-  console.log(req.body)
-  if(!userId) res.json({
-    message: 'No user provided'
-  });
+  const { userId, title, date, cover, songs, artistId, description } = req.body
 
   const findUser = await User.findById(userId);
   const findArtist = await Artist.findById(artistId);
-
-  if(!findUser) res.json({
-    message: 'User does not exist'
-  });
-
-  if(!findArtist) res.json({
-    message: 'Artist does not exist'
-  });
-
-  if(!artistId || !userId) res.json({
-    message: 'User not authorized'
-  });
 
   try {
     const newAlbum = new Album({date, cover, songs, title, artist: artistId, description, user: userId, createdAt: new Date().toISOString()})

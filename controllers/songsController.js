@@ -94,26 +94,34 @@ const getSong = async (req, res) => {
 }
 
 const addSong = async (req, res) => {
-  const { userId, title, cover, album, lyrics, date, artists, artistId, song } = req.body
+  const { userId, title, cover, album, lyrics, date, artistId, song } = req.body
+
+  console.log(req.body)
+  try {
+    const newSong = new Song({song, title, cover, album, lyrics, date, artist: artistId, user: userId })
+    await newSong.save();
+    res.status(200).json(newSong);
+  } catch (error) {
+    res.status(409).json({message: error.message})
+  }
+}
+
+const getFavorites = async (req, res) => {
+  const { userId } = req.params
 
   if(!userId) res.json({
     message: 'No user provided'
   });
 
    const findUser = await User.findById(userId);
-   const findArtist = await Artist.findById(artistId);
+
   if(!findUser) res.json({
     message: 'User does not exist'
   });
 
-  if(!findUser || !findArtist) res.json({
-    message: 'Artist not authorized'
-  });
-
   try {
-    const newSong = new Song({song, title, cover, album, lyrics, date, artist: artistId, user: userId, createdAt: new Date().toISOString()})
-    await newSong.save();
-    res.status(200).json(newSong);
+    const song = await Song.find({lovedUsers: userId}).populate('user').populate('lovedUsers').populate('album').populate('artist');
+    res.status(200).json(song);
   } catch (error) {
     res.status(409).json({message: error.message})
   }
@@ -153,7 +161,7 @@ const loveSong = async (req, res) => {
         const updatedSong = await Song.findOneAndUpdate(
           { _id: songData._id },
           {
-            $inc: { loveCount: -1 },
+            $inc: { loveCount: findSong.loveCount <= 0 ? 0 : -1 },
             $pull: { lovedUsers: userId }
           }
         ).populate('user').populate('artist');
@@ -260,4 +268,53 @@ const topPlay = async (req, res) => {
   res.json({songs})
 }
 
-module.exports = {topPlay, searchSong, getSongsByArtist, addSong, getNewSongs, getSongs, getSong, updateSong, deleteSong , loveSong, playSong, downloadSong, viewSong}
+const addToPlaylist = async (req, res) => {
+  const { songId } = req.params;
+  const { userId } = req.body
+
+  try {
+    const songData = await Song.findById(songId);
+    const userData = await User.findById(userId);
+    if (songData) {
+      const findSong = userData.playlist.includes(songId);
+      if (findSong) {
+        const updatedSong = await User.findOneAndUpdate(
+          { _id: userData._id },
+          {
+            $pull: { playlist: findSong._id }
+          }
+        ).populate('artist');
+        res.status(200).json({
+          song: updatedSong,
+        });
+        } else {
+          const updatedSong = await User.findOneAndUpdate(
+            { _id: userData._id },
+            {
+              $push: { playlist: songId }
+            }
+          ).populate('artist');
+          res.status(200).json({
+            song: updatedSong,
+          });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+const getPlaylist = async (req, res) => {
+  const { userId } = req.params
+  try {
+    const userData = await User.findById(userId).populate('playlist').populate('artist');
+    res.status(200).json({
+      song: userData,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+module.exports = {addToPlaylist, getPlaylist, getFavorites, topPlay, searchSong, getSongsByArtist, addSong, getNewSongs, getSongs, getSong, updateSong, deleteSong , loveSong, playSong, downloadSong, viewSong}

@@ -5,7 +5,7 @@ const Artist = require('../models/artistModel');
 
 const getArtists = async (req, res) => {
   try {
-      const artist = await Artist.find().populate('user').sort({"createdAt": -1}).populate('lovedUsers');
+      const artist = await Artist.find().populate('user').sort({"createdAt": -1});
       res.status(200).json(artist)
   } catch (error) {
     console.log(error.message)
@@ -16,7 +16,7 @@ const getArtists = async (req, res) => {
 const getArtist = async (req, res) => {
   const { id } = req.params;
   try {
-      const artist = await Artist.findById(id).populate('user').populate('lovedUsers');
+      const artist = await Artist.findById(id).populate('user');
       res.status(200).json({artist})
   } catch (error) {
     console.log(error.message)
@@ -62,8 +62,60 @@ const updateArtist = async (req, res) => {
       error: error.message,
     });
   }
-
 }
+
+const supportArtist = async (req, res) => {
+  const { artistId } = req.params;
+  const { userId } = req.body;
+  console.log(artistId)
+  console.log(userId)
+  try {
+    const artistData = await Artist.findById(artistId);
+    if (artistData) {
+      const findArtist = artistData.followedUsers.includes(userId);
+      if (findArtist) {
+        const updateArtist = await Artist.findOneAndUpdate(
+          { _id: artistData._id },
+          {
+            $inc: { followedUsersCount: -1 },
+            $pull: { followedUsers: userId }
+          }
+        ).populate('user').populate('followedUsers');
+        res.status(200).json({
+          artist: updateArtist,
+        });
+        } else {
+          const updateArtist = await Artist.findOneAndUpdate(
+            { _id: artistId },
+            {
+              $inc: { followedUsersCount: 1 },
+              $push: { followedUsers: userId }
+            }
+          ).populate('user').populate('followedUsers');
+          res.status(200).json({
+            artist: updateArtist,
+          });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+const getSupportArtist = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const artistData = await Artist.find({followedUsers: userId}).populate('user').populate('followedUsers');
+    console.log(artistData)
+    res.status(200).json({
+      artist: artistData,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 const deleteArtist = async (req, res) => {
   const { id: _id } = req.params;
@@ -117,4 +169,4 @@ const viewArtist = async (req, res) => {
   res.json(updatedArtist)
 }
 
-module.exports = { getArtists, getArtist, updateArtist, deleteArtist , loveArtist, viewArtist}
+module.exports = {getSupportArtist, supportArtist, getArtists, getArtist, updateArtist, deleteArtist , loveArtist, viewArtist}
