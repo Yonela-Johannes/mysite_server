@@ -33,9 +33,17 @@ app.use(
   })
 )
 
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log("db connected"))
-.catch((err) => console.log(err.message));
+const connectDatabase = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true});
+    console.log("connected to database");
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+connectDatabase()
 
 app.use(cookieParser())
 app.use(passport.initialize());
